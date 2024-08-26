@@ -16,6 +16,8 @@ using System.Text.Json.Serialization;
 #region BUILDER
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors();
+
 builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(
     options => options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 // Como o Artistas e Musica tem dependencias entre si o RefenceHandler vai resolver isso
@@ -58,5 +60,7 @@ app.AddEndpointMusicas();
 app.UseSwagger();
 app.UseSwaggerUI();
 //Chamando o Swagger
+
+app.UseCors(x => x.AllowAnyMethod().AllowAnyHeader().SetIsOriginAllowed(origin => true).AllowCredentials());
 
 app.Run();
