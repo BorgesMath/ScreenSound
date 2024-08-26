@@ -1,0 +1,18 @@
+﻿<MudCard>
+    <MudCardMedia Image="images/cardArtista.png"></MudCardMedia>
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h6">@Artista!.Nome</MudText>
+        </CardHeaderContent>
+    </MudCardHeader>
+    <MudCardContent>
+        <MudText Typo="Typo.body2">@Artista!.Bio</MudText>
+    </MudCardContent>
+</MudCard>
+
+@code {
+    // O parametro é o jeito de enviar os parametros para o componente Blazor
+    [Parameter]
+    public ArtistaResponse? Artista { get; set; }
+
+}
