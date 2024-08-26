@@ -1,5 +1,8 @@
 ﻿@page "/CadastrarArtista"
 @using MudBlazor
+@inject ArtistaAPI artistaAPI
+@inject NavigationManager navigationManager
+
 
 <h3>CadastrarArtista</h3>
 
@@ -11,19 +14,51 @@
 
         <MudTextField Class="mt-4" T="string" Placeholder="Nome do Artista"
                       Variant="Variant.Outlined"
+                      @bind-Value="nome"
                       Required="true"
                       RequiredError="Campo obrigatório." />
 
         <MudTextField Class="mt-4" T="string" Placeholder="Biografia do artista"
                       Variant="Variant.Outlined"
+                      @bind-Value="bio"
                       Lines="4"
                       Required="true"
                       RequiredError="Campo obrigatório." />
+
+        <div class="d-flex align-center justify-space-between mt-4">
+            <MudButton Variant="Variant.Filled"
+                       @onclick="Cadastrar"
+                       Color="Color.Primary"
+                       Class="ml-auto">
+                Cadastrar
+            </MudButton>
+        </div>
+
+        <div class="d-flex align-center justify-space-between mt-4">
+            <MudButton Variant="Variant.Filled"
+                       @onclick="Voltar"
+                       Color="Color.Primary"
+                       Class="ml-auto">
+                 Voltar  
+            </MudButton>
+        </div>
 
     </MudForm>
 </MudPaper>
 
 @code {
+    private string? nome;
+    private string? bio;
 
+    private async Task Cadastrar()
+    {
+        ArtistaRequest request = new(nome!, bio!);
+        await artistaAPI.AddArtistaAsync(request);
+        navigationManager.NavigateTo("/Artistas");
 
+    }
+    private void Voltar()
+    {
+        navigationManager.NavigateTo("/");
+    }
 }

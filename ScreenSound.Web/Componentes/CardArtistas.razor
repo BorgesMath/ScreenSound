@@ -1,4 +1,7 @@
-﻿<MudCard>
+﻿@* Constroe um card que é usado na pagina inicial 
+onde nele é necessario passar um artistaResponse,
+que é mostrado pelo [Request] *@
+<MudCard>
     <MudCardMedia Image="images/cardArtista.png"></MudCardMedia>
     <MudCardHeader>
         <CardHeaderContent>
@@ -8,6 +11,16 @@
     <MudCardContent>
         <MudText Typo="Typo.body2">@Artista!.Bio</MudText>
     </MudCardContent>
+
+
+   @*  // Botao para navegar ate os local onde é possivel editar *@
+    <MudCardActions>
+        <MudButton Color="Color.Warning"
+                   Variant="Variant.Outlined"
+                   Href=@($"/EditarArtista/{Artista!.Nome}")>Detalhes</MudButton>
+    </MudCardActions>
+
+
 </MudCard>
 
 @code {
