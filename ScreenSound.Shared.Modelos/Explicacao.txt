@@ -1,0 +1,3 @@
+﻿//Esse projeto visa poder compartilhar os modelos com os diversos tipos
+//tipo a API e o projeto Console
+

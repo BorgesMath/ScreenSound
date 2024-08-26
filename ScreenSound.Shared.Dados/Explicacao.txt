@@ -1,0 +1,9 @@
+﻿// Esse projeto serve para tratar a conexão dos dados.
+//Na pasta Banco tem o DAL e o ScreenSoundCOntext
+//o primeiro faz a manipulações dos dados e o segundo a conexão
+
+//A pasta migration serve para salvar e atualizar o Banco de Dados
+//usando o frameWork ;
+
+// Necessario Adicionar referencia de Modelos!
+// E as bibliotecas do EntityFrameWork.Core
