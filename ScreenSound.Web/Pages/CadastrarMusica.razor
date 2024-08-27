@@ -311,10 +311,7 @@
             }
         }
 
-        var informacoes = $"Nome: {nome}\n" +
-                          $"Artista Id: {ArtistaDaMusica?.Id}\n" +
-                          $"Ano de Lançamento: {AnoLancamento}\n" +
-                          $"Gêneros: {string.Join(", ", GenerosRequest.Select(g => g.Nome))}";
+        var informacoes = $"Gêneros: {string.Join(", ", GenerosRequest.Select(g => g.Nome))}";
 
         Console.WriteLine(informacoes);
 
@@ -333,19 +330,43 @@
         navigationManager.NavigateTo("/");
     }
 
+    private async Task<bool> ConfirmarCadastro()
+    {
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true };
+        var result = await DialogService.ShowMessageBox("Confirmar Cadastro", "Deseja confirmar o cadastro da música?", "Sim", "Não", options: options);
+        return result == true;
+    }
+
     public async Task Cadastrar()
     {
-        if (GeneroSelecionados is not null)
+        if (GeneroSelecionados is not null && ArtistaDaMusica != null && !string.IsNullOrEmpty(nome) && AnoLancamento > 0)
         {
+            // Limpeza de GenerosRequest para evitar duplicações
+            GenerosRequest.Clear();
+
             foreach (var gen in GeneroSelecionados)
             {
                 GenerosRequest.Add(new GeneroRequest(gen.Nome, gen.Descricao));
             }
-        }
 
-        MusicaRequest musicaReq = new(nome!, ArtistaDaMusica!.Id, AnoLancamento, GenerosRequest);
-        await musicaAPI.AddMusicaAsync(musicaReq);
-        navigationManager.NavigateTo("/MusicasPorArtista");
+            MusicaRequest musicaReq = new(nome, ArtistaDaMusica.Id, AnoLancamento, GenerosRequest);
+
+            // Confere se a requisição foi bem-sucedida
+            var (sucesso, errorMessage) = await musicaAPI.AddMusicaAsync(musicaReq);
+            if (sucesso)
+            {
+                navigationManager.NavigateTo("/MusicasPorArtista");
+            }
+            else
+            {
+                // Exibe a mensagem de erro detalhada
+                await DialogService.ShowMessageBox("Erro", $"Não foi possível cadastrar a música. Motivo: {errorMessage}", "Ok");
+            }
+        }
+        else
+        {
+            await DialogService.ShowMessageBox("Erro", "Preencha todos os campos obrigatórios antes de cadastrar.", "Ok");
+        }
     }
 
 
@@ -353,7 +374,15 @@
     private async Task MostrarInformacoesECadastrar()
     {
         await MostrarInformacoes();  // Chama o método para mostrar as informações
-        await Cadastrar();           // Chama o método para cadastrar a música
+
+        // Aguarda a confirmação do usuário antes de continuar
+        bool confirm = await ConfirmarCadastro();
+        if (confirm)
+        {
+            await Cadastrar();       // Chama o método para cadastrar a música
+        }
+
+        navigationManager.NavigateTo("/MusicasPorArtista");
     }
 
 }
