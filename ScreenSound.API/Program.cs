@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using ScreenSound.API.Endpoints;
 using ScreenSound.Banco;
 using ScreenSound.Modelos;
+using ScreenSound.Shared.Modelos.Modelos;
 using System.Text.Json.Serialization;
 
 
@@ -26,6 +27,7 @@ builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(
 builder.Services.AddDbContext<ScreenSoundContext>();
 builder.Services.AddTransient<DAL<Artista>>();
 builder.Services.AddTransient<DAL<Musica>>();
+builder.Services.AddTransient<DAL<Genero>>();
 
 //O ASP.NET cria esses objetos para usar no app. so
 // precisa explicitar no codigo, usando o [FromServices]
@@ -53,6 +55,7 @@ var app = builder.Build();
 
 app.AddEndPointsArtistas();
 app.AddEndpointMusicas();
+app.AddEndPointGeneros();
 
 #endregion
 

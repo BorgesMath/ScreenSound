@@ -13,6 +13,8 @@ builder.Services.AddMudServices();
 
 
 builder.Services.AddTransient<ArtistaAPI>();
+builder.Services.AddTransient<GeneroAPI>();
+builder.Services.AddTransient<MusicaAPI>();
 
 builder.Services.AddHttpClient("API", client =>
 {
