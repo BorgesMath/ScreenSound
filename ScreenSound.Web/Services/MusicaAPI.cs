@@ -17,7 +17,7 @@ public class MusicaAPI(IHttpClientFactory factory)
     {
         try
         {
-            var response = await _httpClient.PostAsJsonAsync("musicas", request);
+            var response = await _httpClient.PostAsJsonAsync("musica", request);
 
             if (response.IsSuccessStatusCode)
             {
