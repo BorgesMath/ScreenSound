@@ -1,5 +1,100 @@
-﻿<h3>EditarMusica</h3>
+﻿@page "/EditarMusica/{NomeMusica}"
+
+@using MudBlazor
+@inject MusicaAPI musicaAPI
+@inject NavigationManager navigationManager
+
+
+<MudPaper Class="px-8 pt-2 pb-4 mx-12 my-8" Justify="Justify.Center">
+
+    <MudText Class="mt-8" Typo="Typo.h4">Edição da  Musica</MudText>
+
+    <MudForm>
+
+        <MudTextField Class="mt-4" T="string" Placeholder="Nome da Musica"
+                      Variant="Variant.Outlined"
+                      @bind-Value="nome"
+                      Required="true"
+                      RequiredError="Campo obrigatório." />
+
+        <MudTextField Class="mt-4" T="int" Placeholder="anoLancamento"
+                      Variant="Variant.Outlined"
+                      @bind-Value="anoLancamento"
+                      Lines="4"
+                      Required="true"
+                      RequiredError="Campo obrigatório." />
+
+        <div class="d-flex align-center justify-space-between mt-4">
+            <MudButton Variant="Variant.Filled"
+                       @onclick="Deletar"
+                       Color="Color.Secondary"
+                       Class="ml-auto">
+                Deletar
+            </MudButton>
+        </div>
+
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   Class="ml-auto"
+                   @onclick="Editar">
+            Salvar
+        </MudButton>
+
+        <div class="d-flex align-center justify-space-between mt-4">
+            <MudButton Variant="Variant.Filled"
+                       @onclick="Voltar"
+                       Color="Color.Primary"
+                       Class="ml-auto">
+                Voltar
+            </MudButton>
+        </div>
+
+    </MudForm>
+</MudPaper>
+
+
 
 @code {
+
+    private string? nome;
+    private int anoLancamento;
+
+    //Esse parametro vem do Http, no caminho da pagina
+    [Parameter]
+    public string? NomeMusica { get; set; }
+
+    public int ArtistaId { get; set; }
+
+    public MusicaResponse? response { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        var (response, ok, mensagem) = await musicaAPI.GetMusicaPorNomeAsync(NomeMusica!);
+        nome = response!.Nome;
+        ArtistaId = response.ArtistaId;
+        anoLancamento = response.AnoLancamento;
+
+    }
+
+    private async Task Editar()
+    {
+        //int Id, string Nome, int ArtistaId, int AnoLancamento
+        var requestEdit = new MusicaRequestEdit(response!.Id, nome!, ArtistaId, anoLancamento);
+        await musicaAPI.AtualizarMusicaAsync(requestEdit);
+        navigationManager.NavigateTo("/Musica");
+    }
+
+    private async Task Deletar()
+    {
+
+        await musicaAPI.DeleteMusicaAsync(response!.Id);
+        navigationManager.NavigateTo("/Musicas");
+    }
+
+    private void Voltar()
+    {
+        navigationManager.NavigateTo("/");
+    }
 
 }

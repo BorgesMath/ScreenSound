@@ -41,22 +41,48 @@ public static class MusicasExtensions
 
         );
 
+
         app.MapGet("/Musicas/{nome}", ([FromServices] DAL<Musica> dal, string nome) =>
 
         {
-            var musica = dal.RecuperarPor(a => a.Nome.Equals(nome, StringComparison.OrdinalIgnoreCase));
+            var lista = dal.ListarComArtistasEGeneros();
+            // Problema, estou tendo que puxar a lista inteira de musicas o que diminui a qualidade.
+            //Esse problema vem do lazy proxy
+
+            var musica = lista.FirstOrDefault(a => a.Nome.Equals(nome, StringComparison.OrdinalIgnoreCase));
 
             if (musica == null)
             {
                 return Results.NotFound();
             }
 
-            //return Results.Ok(musica);
+            //return Results.Ok(musica);s
             return Results.Ok(EntityToResponse(musica));
 
         }
 
         );
+
+
+
+
+
+        //app.MapGet("/Musicas/{nome}", ([FromServices] DAL<Musica> dal, string nome) =>
+
+        //{
+        //    var musica = dal.RecuperarPor(a => a.Nome.Equals(nome, StringComparison.OrdinalIgnoreCase));
+
+        //    if (musica == null)
+        //    {
+        //        return Results.NotFound();
+        //    }
+
+        //    //return Results.Ok(musica);
+        //    return Results.Ok(EntityToResponse(musica));
+
+        //}
+
+        //);
 
         app.MapPost("/Musica", ([FromServices] DAL<Musica> dal, [FromServices] DAL<Genero> dalGenero, [FromBody] MusicaRequest musicaRequest) =>
         {
@@ -118,7 +144,7 @@ public static class MusicasExtensions
             var entity = RequestToEntity(genero);
             // primeiro passo transformar de generoRequest para genero
 
-            var Gen = dalGenero.RecuperarPor(g => g.Nome.Equals(genero.Nome, StringComparison.OrdinalIgnoreCase));
+            var Gen = dalGenero.RecuperarPor(g => g.Nome!.Equals(genero.Nome, StringComparison.OrdinalIgnoreCase));
             
             if (Gen is not null)
             {
@@ -163,7 +189,7 @@ public static class MusicasExtensions
 
     private static MusicaResponse EntityToResponse(Musica musica)
     {
-        return new MusicaResponse(musica.Id, musica.Nome!,  musica.Artista!.Id, musica.Artista.Nome);
+        return new MusicaResponse(musica.Id, musica.Nome!,  musica.Artista!.Id, musica.Artista.Nome, musica.AnoLancamento);
     }
 
     #endregion

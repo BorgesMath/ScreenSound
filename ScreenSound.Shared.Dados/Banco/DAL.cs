@@ -8,19 +8,14 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace ScreenSound.Banco;
-public class DAL<T> where T : class
+public class DAL<T>(ScreenSoundContext context) where T : class
     // Clase publica para ser acessada pelos outros projetos
 {
-    private readonly ScreenSoundContext context;
-
-    public DAL(ScreenSoundContext context)
-    {
-        this.context = context;
-    }
+    private readonly ScreenSoundContext context = context;
 
     public IEnumerable<T> Listar()
     {
-        return context.Set<T>().ToList();
+        return [.. context.Set<T>()];
     }
     public void Adicionar(T objeto)
     {
