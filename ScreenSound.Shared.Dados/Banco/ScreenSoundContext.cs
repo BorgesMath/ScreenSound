@@ -1,6 +1,8 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using ScreenSound.Modelos;
+using ScreenSound.Shared.Dados.Modelos;
 using ScreenSound.Shared.Modelos.Modelos;
 using System;
 using System.Collections.Generic;
@@ -10,7 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace ScreenSound.Banco;
-public class ScreenSoundContext: DbContext
+public class ScreenSoundContext: IdentityDbContext<PessoaComAcesso, PerfilComAcesso, int>
 {
 
     //  DbSet vai fazer com que essas classes se tornem tabelas
@@ -44,6 +46,9 @@ public class ScreenSoundContext: DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+
+        base.OnModelCreating(modelBuilder);
+
         modelBuilder.Entity<Musica>()
             .HasMany(c => c.Generos).WithMany(c => c.Musicas);
         //Aqui é feito para relacionar musicas e generos
