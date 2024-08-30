@@ -70,16 +70,16 @@ builder.Services.AddSwaggerGen();
 //e até mesmo testar as chamadas API diretamente da interface de documentação.
 
 
-
 builder.Services.AddCors(
     options => options.AddPolicy(
         "wasm",
-        policy => policy.WithOrigins([builder.Configuration["BackendUrl"] ?? "https://localhost:7089",
-            builder.Configuration["FrontendUrl"] ?? "https://localhost:7015"])
+        policy => policy.WithOrigins([builder.Configuration["BackendUrl"] ?? "https://localhost:7210",
+            builder.Configuration["FrontendUrl"] ?? "https://localhost:7002"])
             .AllowAnyMethod()
             .SetIsOriginAllowed(pol => true)
             .AllowAnyHeader()
             .AllowCredentials()));
+
 
 // Isso serve para que e a conexão da API seja apenas usada pelo frontEnd, o ScreenSound Web
 
