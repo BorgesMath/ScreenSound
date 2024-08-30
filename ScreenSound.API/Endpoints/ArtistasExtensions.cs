@@ -126,7 +126,7 @@ public static class ArtistasExtensions
     }
 
     #region FuncoesDeAjuda
-    private static ICollection<ArtistaResponse> EntityListToResponseList(IEnumerable<Artista> listaDeArtistas)
+    private static List<ArtistaResponse> EntityListToResponseList(IEnumerable<Artista> listaDeArtistas)
     {
         return listaDeArtistas.Select(a => EntityToResponse(a)).ToList();
     }

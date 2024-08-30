@@ -38,9 +38,13 @@ builder.Services
 //Aidiconando o Identity EndPoint, gerado automanticamente
 
 
+
 builder.Services
     .AddAuthentication();
 //Adicionando O serviço de Autenticação Do Identnty
+
+builder.Services
+    .AddAuthorization(); // Adiciona o serviço de autorização
 
 
 builder.Services.AddTransient<DAL<Artista>>();
@@ -109,7 +113,7 @@ app.UseAuthentication();
 //Obrigatorio antes dos EndPoits,
 // Para permitir ou nao mexer neles
 
-//app.UseAuthorization(); // Adiciona o middleware de autorização
+app.UseAuthorization(); // Adiciona o middleware de autorização
 #endregion
 
 #region ChamadaDeEndPoints
