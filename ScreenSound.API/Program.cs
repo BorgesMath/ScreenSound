@@ -51,6 +51,7 @@ builder.Services.AddTransient<DAL<Artista>>();
 builder.Services.AddTransient<DAL<Musica>>();
 builder.Services.AddTransient<DAL<Genero>>();
 
+
 //O ASP.NET cria esses objetos para usar no app. so
 // precisa explicitar no codigo, usando o [FromServices]
 

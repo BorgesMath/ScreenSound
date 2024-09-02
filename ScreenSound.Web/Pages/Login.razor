@@ -2,6 +2,7 @@
 @using MudBlazor
 @using MudBlazor.Utilities
 @inject AuthAPI authAPI
+@inject NavigationManager navigation
 
 <MudPaper Class="px-8 pt-2 pb-4 mx-16 my-8" Justify="Justify.Center">
     <MudForm>
@@ -22,21 +23,37 @@
             Login
         </MudButton>
 
-    </MudForm>
-    </MudPaper>
+        @if (!string.IsNullOrEmpty(erro))
+        {
+            <MudAlert Severity="Severity.Error" Class="mt-4">
+                @erro
+                <br />
+                <strong>JSON Enviado:</strong>
+                <pre>@sentJson</pre>
+            </MudAlert>
+        }
 
+    </MudForm>
+</MudPaper>
 
 @code {
-    private string? email;
-    private string? senha;
-
+    private string email = string.Empty;
+    private string senha = string.Empty;
+    private string erro = string.Empty; // Variável para armazenar a mensagem de erro
+    private string sentJson = string.Empty; // Variável para armazenar o JSON enviado
 
     private async Task FazerLogin()
     {
-        await authAPI.LoginAsync(email, senha);
+        var resp = await authAPI.LoginAsync(email, senha);
+
+        if (resp.Success)
+        {
+            navigation.NavigateTo("/Artistas");
+        }
+        else
+        {
+            erro = resp.ErrorMessage; // Armazena a mensagem de erro
+            sentJson = resp.SentJson; // Armazena o JSON enviado
+        }
     }
-
-
-
-
 }
