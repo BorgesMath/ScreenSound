@@ -17,7 +17,11 @@ public class MusicaAPI(IHttpClientFactory factory)
     {
         try
         {
+<<<<<<< HEAD
             var response = await _httpClient.PostAsJsonAsync("musicas", request);
+=======
+            var response = await _httpClient.PostAsJsonAsync("musica", request);
+>>>>>>> 364f7643b0ea2e8a607896558687b17635331ad9
 
             if (response.IsSuccessStatusCode)
             {
@@ -49,7 +53,11 @@ public class MusicaAPI(IHttpClientFactory factory)
     {
         try
         {
+<<<<<<< HEAD
             var response = await _httpClient.DeleteAsync($"musicas/{Id}");
+=======
+            var response = await _httpClient.DeleteAsync($"musica/{Id}");
+>>>>>>> 364f7643b0ea2e8a607896558687b17635331ad9
 
             if (response.IsSuccessStatusCode)
             {
@@ -83,7 +91,11 @@ public class MusicaAPI(IHttpClientFactory factory)
     {
         try
         {
+<<<<<<< HEAD
             var response = await _httpClient.PutAsJsonAsync("musicas", requestEdit);
+=======
+            var response = await _httpClient.PutAsJsonAsync("musica", requestEdit);
+>>>>>>> 364f7643b0ea2e8a607896558687b17635331ad9
             // Ver se é musicas ou musica
 
             if (response.IsSuccessStatusCode)
