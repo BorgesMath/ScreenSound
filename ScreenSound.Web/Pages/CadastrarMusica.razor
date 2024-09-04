@@ -1,6 +1,11 @@
 ﻿@page "/CadastrarMusica"
 @inject ArtistaAPI artistaAPI
 @inject GeneroAPI generoAPI
+@inject MusicaAPI musicaAPI
+@inject NavigationManager navigationManager
+
+<!-- ADICIONADO: Injeção do serviço de diálogo -->
+@inject IDialogService DialogService
 
 <MudPaper Class="px-8 pt-2 pb-4 mx-12 my-8" Justify="Justify.Center">
 
@@ -15,7 +20,9 @@
                       RequiredError="Campo obrigatório." />
 
         <MudPopoverProvider></MudPopoverProvider>
-        <MudSelect Class="mt-4" T="ArtistaResponse" Label="Artistas" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+        <MudSelect Class="mt-4" T="ArtistaResponse" Label="Artistas"
+                   Variant="Variant.Outlined" ValueChanged="ArtistaSelecionado"
+                   AnchorOrigin="Origin.BottomCenter">
             @if (artistas is not null)
             {
                 @foreach (var artista in artistas)
@@ -26,35 +33,80 @@
         </MudSelect>
 
         <MudTextField Class="mt-4" T="string" Placeholder="Ano de lançamento"
-                      @bind-Value="anoLancamento"
+                      @bind-Value="_anoLancamento"
                       Variant="Variant.Outlined"
                       Lines="1"
                       Required="true"
                       RequiredError="Campo obrigatório." />
 
         <MudPopoverProvider></MudPopoverProvider>
-        <MudSelect Class="mt-4" T="GeneroResponse" Label="Artistas" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
-            @if (artistas is not null)
+        <MudSelect Class="mt-4" T="GeneroResponse" Label="Genero"
+                   Variant="Variant.Outlined" ValueChanged="GeneroSelecionado"
+                   AnchorOrigin="Origin.BottomCenter">
+            @if (generos is not null)
             {
                 @foreach (var genero in generos)
                 {
                     <MudSelectItem Value="@genero">@genero.Nome</MudSelectItem>
                 }
             }
+            @if (GeneroSelecionados is not null)
+            {
+                @foreach (var generoSelct in GeneroSelecionados)
+                {
+                    <MudAlert Severity="Severity.Info">@(generoSelct.Nome) adicionado</MudAlert>
+                }
+            }
         </MudSelect>
 
-    </MudForm>
+        <div class="d-flex align-center justify-space-between mt-4">
+            <!-- ALTERADO: Evento @onclick para chamar MostrarInformacoes -->
+            <MudButton Variant="Variant.Filled"
+                       @onclick="MostrarInformacoesECadastrar"
+                       Color="Color.Primary"
+                       Class="ml-auto">
+                Cadastrar
+            </MudButton>
+        </div>
 
+        <div class="d-flex align-center justify-space-between mt-4">
+            <MudButton Variant="Variant.Filled"
+                       @onclick="Voltar"
+                       Color="Color.Primary"
+                       Class="ml-auto">
+                Voltar
+            </MudButton>
+        </div>
+
+    </MudForm>
 
 </MudPaper>
 
 @code {
     private string? nome;
-    private string? anoLancamento;
+    private string? _anoLancamento;
+
+    private int AnoLancamento
+    {
+        get
+        {
+            if (int.TryParse(_anoLancamento, out int ano))
+            {
+                return ano;
+            }
+            return 0;
+        }
+        set
+        {
+            _anoLancamento = value.ToString();
+        }
+    }
 
     private ICollection<ArtistaResponse>? artistas;
     private ICollection<GeneroResponse>? generos;
-    private string? mensagemErro;
+
+    private List<GeneroResponse>? GeneroSelecionados { get; set; } = new();
+    private ArtistaResponse? ArtistaDaMusica { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -63,6 +115,108 @@
         Console.WriteLine($"Artistas carregados: {artistas?.Count}");
     }
 
+    private void ArtistaSelecionado(ArtistaResponse artistaResp)
+    {
+        ArtistaDaMusica = artistaResp;
+    }
+
+    private void GeneroSelecionado(GeneroResponse genero)
+    {
+        if (GeneroSelecionados is not null)
+        {
+            if (!GeneroSelecionados.Contains(genero))
+            {
+                GeneroSelecionados.Add(genero);
+            }
+        }
+    }
+
+    private List<GeneroRequest> GenerosRequest { get; set; } = new();
+
+    // ALTERADO: Método MostrarInformacoes para exibir os dados
+    private async Task MostrarInformacoes()
+    {
+        if (GeneroSelecionados is not null)
+        {
+            GenerosRequest.Clear();
+            foreach (var gen in GeneroSelecionados)
+            {
+                GenerosRequest.Add(new GeneroRequest(gen.Nome, gen.Descricao));
+            }
+        }
+
+        var informacoes = $"Gêneros: {string.Join(", ", GenerosRequest.Select(g => g.Nome))}";
+
+        Console.WriteLine(informacoes);
+
+        var parameters = new DialogParameters
+            {
+                ["Content"] = informacoes
+            };
+
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true };
+
+        await DialogService.ShowMessageBox("Informações da Música", informacoes, "Ok", options: options);
+    }
+
+    private void Voltar()
+    {
+        navigationManager.NavigateTo("/");
+    }
+
+    private async Task<bool> ConfirmarCadastro()
+    {
+        var options = new DialogOptions { MaxWidth = MaxWidth.Small, FullWidth = true };
+        var result = await DialogService.ShowMessageBox("Confirmar Cadastro", "Deseja confirmar o cadastro da música?", "Sim", "Não", options: options);
+        return result == true;
+    }
+
+    public async Task Cadastrar()
+    {
+        if (GeneroSelecionados is not null && ArtistaDaMusica != null && !string.IsNullOrEmpty(nome) && AnoLancamento > 0)
+        {
+            // Limpeza de GenerosRequest para evitar duplicações
+            GenerosRequest.Clear();
+
+            foreach (var gen in GeneroSelecionados)
+            {
+                GenerosRequest.Add(new GeneroRequest(gen.Nome, gen.Descricao));
+            }
+
+            MusicaRequest musicaReq = new(nome, ArtistaDaMusica.Id, AnoLancamento, GenerosRequest);
+
+            // Confere se a requisição foi bem-sucedida
+            var (sucesso, errorMessage) = await musicaAPI.AddMusicaAsync(musicaReq);
+            if (sucesso)
+            {
+                navigationManager.NavigateTo("/MusicasPorArtista");
+            }
+            else
+            {
+                // Exibe a mensagem de erro detalhada
+                await DialogService.ShowMessageBox("Erro", $"Não foi possível cadastrar a música. Motivo: {errorMessage}", "Ok");
+            }
+        }
+        else
+        {
+            await DialogService.ShowMessageBox("Erro", "Preencha todos os campos obrigatórios antes de cadastrar.", "Ok");
+        }
+    }
+
+
+
+    private async Task MostrarInformacoesECadastrar()
+    {
+        await MostrarInformacoes();  // Chama o método para mostrar as informações
+
+        // Aguarda a confirmação do usuário antes de continuar
+        bool confirm = await ConfirmarCadastro();
+        if (confirm)
+        {
+            await Cadastrar();       // Chama o método para cadastrar a música
+        }
+
+        navigationManager.NavigateTo("/MusicasPorArtista");
+    }
 
 }
-

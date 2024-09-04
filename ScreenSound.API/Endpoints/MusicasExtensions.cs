@@ -58,7 +58,7 @@ public static class MusicasExtensions
 
         );
 
-        app.MapPost("/Musica", ([FromServices] DAL<Musica> dal, [FromServices] DAL<Genero> dalGenero, [FromBody] MusicaRequest musicaRequest) =>
+        app.MapPost("/Musicas", ([FromServices] DAL<Musica> dal, [FromServices] DAL<Genero> dalGenero, [FromBody] MusicaRequest musicaRequest) =>
         {
             Musica musica = new(musicaRequest.Nome)
             {
@@ -72,7 +72,7 @@ public static class MusicasExtensions
         });
 
 
-        app.MapDelete("/Musica/{id}", ([FromServices] DAL<Musica> dal, int id) =>
+        app.MapDelete("/Musicas/{id}", ([FromServices] DAL<Musica> dal, int id) =>
         {
             var musica = dal.RecuperarPor(a => a.Id == id);
             if (musica is null)
@@ -86,7 +86,7 @@ public static class MusicasExtensions
         });
 
 
-        app.MapPut("/Musica", ([FromServices] DAL<Musica> dal, [FromBody] MusicaRequestEdit musicaEdit) =>
+        app.MapPut("/Musicas", ([FromServices] DAL<Musica> dal, [FromBody] MusicaRequestEdit musicaEdit) =>
         {
             var musicaAAtualizar = dal.RecuperarPor(a => a.Id == musicaEdit.Id);
             if (musicaAAtualizar is null)
