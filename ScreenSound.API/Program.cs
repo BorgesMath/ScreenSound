@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using ScreenSound.API.Endpoints;
 using ScreenSound.Banco;
 using ScreenSound.Modelos;
+using ScreenSound.Shared.Dados.Banco;
 using ScreenSound.Shared.Modelos.Modelos;
 using System.Text.Json.Serialization;
 
@@ -17,7 +18,7 @@ using System.Text.Json.Serialization;
 #region BUILDER
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddCors();
+//builder.Services.AddCors();
 
 builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(
     options => options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
@@ -47,9 +48,22 @@ builder.Services.AddSwaggerGen();
 //as rotas, os métodos HTTP suportados, os parâmetros de entrada,
 //e até mesmo testar as chamadas API diretamente da interface de documentação.
 
+
+builder.Services.AddCors(
+    options => options.AddPolicy(
+        "wasm",
+        policy => policy.WithOrigins([builder.Configuration["BackendUrl"] ?? "https://localhost:7089",
+            builder.Configuration["FrontendUrl"] ?? "https://localhost:7015"])
+            .AllowAnyMethod()
+            .SetIsOriginAllowed(pol => true)
+            .AllowAnyHeader()
+            .AllowCredentials()));
+
 var app = builder.Build();
 
 #endregion
+
+app.UseCors("wasm");
 
 #region ChamadaDeEndPoints
 
