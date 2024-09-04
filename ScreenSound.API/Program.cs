@@ -10,7 +10,10 @@ using ScreenSound.Shared.Dados.Modelos;
 using ScreenSound.Shared.Modelos.Modelos;
 using System.Net;
 using System.Text.Json.Serialization;
-
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.Text;
+using Microsoft.OpenApi.Models;
 
 
 
@@ -37,10 +40,25 @@ builder.Services
         .AddEntityFrameworkStores<ScreenSoundContext>();
 //Aidiconando o Identity EndPoint, gerado automanticamente
 
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Issuer"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+        };
+    });
 
 
-builder.Services
-    .AddAuthentication();
+
+//builder.Services
+//.AddAuthentication();
 //Adicionando O serviço de Autenticação Do Identnty
 
 builder.Services
@@ -57,13 +75,50 @@ builder.Services.AddTransient<DAL<Genero>>();
 
 
 builder.Services.AddEndpointsApiExplorer();
-
 //Quando você chama esse método, ele habilita a geração de metadados para os
 //endpoints do seu aplicativo, que podem
 //então ser utilizados por ferramentas
 //como o Swagger para criar a documentação da API.
 
-builder.Services.AddSwaggerGen();
+
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "ScreenSound API", Version = "v1" });
+
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = @"JWT Authorization header using the Bearer scheme. \r\n\r\n 
+                      Enter 'Bearer' [space] and then your token in the text input below.
+                      \r\n\r\nExample: 'Bearer 12345abcdef'",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                },
+                Scheme = "oauth2",
+                Name = "Bearer",
+                In = ParameterLocation.Header,
+            },
+            new List<string>()
+        }
+    });
+});
+
+
+
+
+//builder.Services.AddSwaggerGen();
 //O Swagger é uma ferramenta amplamente utilizada para
 //gerar documentação interativa para APIs RESTful.
 //Ele permite que os desenvolvedores vejam os endpoints disponíveis,
@@ -110,10 +165,7 @@ app.UseStaticFiles();
 
 
 
-app.UseAuthentication();
-//Obrigatorio antes dos EndPoits,
-// Para permitir ou nao mexer neles
-
+app.UseAuthentication();//Obrigatorio antes dos EndPoits, // Para permitir ou nao mexer neles
 app.UseAuthorization(); // Adiciona o middleware de autorização
 #endregion
 
@@ -131,6 +183,11 @@ app.MapGroup("auth").MapIdentityApi<PessoaComAcesso>().WithTags("Autorização");
 
 app.UseSwagger();
 app.UseSwaggerUI();
+
+
+
+
+
 //Chamando o Swagger
 
 //app.UseCors(x => x.AllowAnyMethod().AllowAnyHeader().SetIsOriginAllowed(origin => true).AllowCredentials());
