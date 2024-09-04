@@ -1,9 +1,4 @@
-<<<<<<< HEAD
-﻿@page "/MusicasPorArtista"
-=======
-﻿
 @page "/MusicasPorArtista"
->>>>>>> 364f7643b0ea2e8a607896558687b17635331ad9
 @inject MusicaAPI musicasAPI
 
 <MudStack Class="mt-4 mb-4" Row="true" Justify="Justify.SpaceBetween">
@@ -16,24 +11,15 @@
         @foreach (var musica in musicaPorPagina)
         {
             <MudItem xs="3">
-<<<<<<< HEAD
                 <CardMusica Musica=musica />
             </MudItem>
-=======
-                <CardMusica Musica =musica/>
-            </MudItem>            
->>>>>>> 364f7643b0ea2e8a607896558687b17635331ad9
         }
     </MudGrid>
 }
 
 
 @code {
-<<<<<<< HEAD
     private int tamanho = 4;
-=======
-    private int tamanho = 8;
->>>>>>> 364f7643b0ea2e8a607896558687b17635331ad9
     private int totalItens;
     private int totalPaginas;
     private ICollection<MusicaResponse>? musicas;

@@ -63,38 +63,14 @@ public static class MusicasExtensions
 
         );
 
-<<<<<<< HEAD
+
         app.MapPost("/Musicas", ([FromServices] DAL<Musica> dal, [FromServices] DAL<Genero> dalGenero, [FromBody] MusicaRequest musicaRequest) =>
-=======
-
-
-
-
-        //app.MapGet("/Musicas/{nome}", ([FromServices] DAL<Musica> dal, string nome) =>
-
-        //{
-        //    var musica = dal.RecuperarPor(a => a.Nome.Equals(nome, StringComparison.OrdinalIgnoreCase));
-
-        //    if (musica == null)
-        //    {
-        //        return Results.NotFound();
-        //    }
-
-        //    //return Results.Ok(musica);
-        //    return Results.Ok(EntityToResponse(musica));
-
-        //}
-
-        //);
-
-        app.MapPost("/Musica", ([FromServices] DAL<Musica> dal, [FromServices] DAL<Genero> dalGenero, [FromBody] MusicaRequest musicaRequest) =>
->>>>>>> 364f7643b0ea2e8a607896558687b17635331ad9
         {
             Musica musica = new(musicaRequest.Nome)
             {
                 AnoLancamento = musicaRequest.AnoLancamento,
                 ArtistaId = musicaRequest.ArtistaId,
-                Generos = musicaRequest.Generos is not null?
+                Generos = musicaRequest.Generos is not null ?
                 GeneroRequestConverter(musicaRequest.Generos, dalGenero) : []
             };
             dal.Adicionar(musica);
