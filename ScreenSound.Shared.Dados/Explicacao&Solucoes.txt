@@ -7,3 +7,6 @@
 
 // Necessario Adicionar referencia de Modelos!
 // E as bibliotecas do EntityFrameWork.Core
+
+
+//OBS: PRECISA FZR UMA ATUALIZAÇÃO NA MIGRATIONS OU APLICAR UM ARTISTAID MANUALMENTE!!!

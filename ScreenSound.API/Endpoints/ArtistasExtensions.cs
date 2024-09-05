@@ -13,9 +13,14 @@ public static class ArtistasExtensions
     public static void AddEndPointsArtistas(this 
         WebApplication app)
     {
+
+        var groupBuilder = app.MapGroup("artistas")
+            .RequireAuthorization()
+            .WithTags("Artistas");
+
         #region Artistas
         // quando fizer um GET no caminho /Artistas vai retornar uma lista de artistas
-        app.MapGet("/Artistas", ([FromServices] DAL<Artista> dal) =>
+        groupBuilder.MapGet("", ([FromServices] DAL<Artista> dal) =>
         // FromServices usado para mostra que sera usado o 
         // o Objeto DAL criado no Transient
         {
@@ -34,19 +39,14 @@ public static class ArtistasExtensions
             // A função EntityListToResponseList cria um lista de ArtistaResponse
             // a partir da Lista de Artista
 
-
-
-
             return Results.Ok(listaDeArtistaResponse);
             //Retorna um StatusCode 200, significando que ta Okay e 
             // retorna uma lista de Artistas
 
-        }
-
-        );
+        });
 
         // quando fizer um GET no caminho /Artistas/{nome} vai retornar o Artista com o nome passado no Http
-        app.MapGet("/Artistas/{nome}", ([FromServices] DAL<Artista> dal, string nome) =>
+        groupBuilder.MapGet("{nome}", ([FromServices] DAL<Artista> dal, string nome) =>
         {
             var artista = dal.RecuperarPor(a => a.Nome.Equals(nome, StringComparison.OrdinalIgnoreCase));
             // O recuperarPor passa uma função por cada Artista (Definido na criação do DAL) dentro do DB
@@ -69,7 +69,7 @@ public static class ArtistasExtensions
         );
 
         // quando fizer um POST no caminho /Artistas/ vai criar o Artista com o os dados passados no Http
-        app.MapPost("/Artistas", ([FromServices] DAL<Artista> dal, [FromBody] ArtistaRequest artistaRequest) =>
+        groupBuilder.MapPost("", ([FromServices] DAL<Artista> dal, [FromBody] ArtistaRequest artistaRequest) =>
         // O FromBody explicita que o artista                                 //ArtistaRequest para que
         // vai vir da requisição Http                                         // Seja pedido no Http só o 
         {                                                                     // Necessario 
@@ -81,7 +81,7 @@ public static class ArtistasExtensions
         );
 
         // quando fizer um DELETE vai apagar o artista dependendo do id dele
-        app.MapDelete("/Artistas/{id}", ([FromServices] DAL<Artista> dal, int id) => {
+        groupBuilder.MapDelete("{id}", ([FromServices] DAL<Artista> dal, int id) => {
             var artista = dal.RecuperarPor(a => a.Id == id);
             //Procura o artista por id e salva na var artista
             if (artista is null)
@@ -99,7 +99,7 @@ public static class ArtistasExtensions
 
         // Atualiza um Artista, o PUT passa um Artista "novo" que sera posto nos dados de outro onde 
         // foi passado dados. 
-        app.MapPut("/Artistas", ([FromServices] DAL<Artista> dal, [FromBody] ArtistaRequestEdit artistaEdit) => {
+        groupBuilder.MapPut("", ([FromServices] DAL<Artista> dal, [FromBody] ArtistaRequestEdit artistaEdit) => {
                                                                                 // Assim vai herdar do Record 
             var artistaAAtualizar = dal.RecuperarPor(a => a.Id == artistaEdit.Id);
             if (artistaAAtualizar is null)
@@ -119,7 +119,7 @@ public static class ArtistasExtensions
     }
 
     #region FuncoesDeAjuda
-    private static ICollection<ArtistaResponse> EntityListToResponseList(IEnumerable<Artista> listaDeArtistas)
+    private static List<ArtistaResponse> EntityListToResponseList(IEnumerable<Artista> listaDeArtistas)
     {
         return listaDeArtistas.Select(a => EntityToResponse(a)).ToList();
     }

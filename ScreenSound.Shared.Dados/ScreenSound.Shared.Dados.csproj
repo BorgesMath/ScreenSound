@@ -7,11 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Explicacao.txt" />
+    <None Remove="Explicacao&amp;Solucoes.txt" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="Explicacao.txt" />
+    <Compile Include="Explicacao&amp;Solucoes.txt" />
   </ItemGroup>
 
 

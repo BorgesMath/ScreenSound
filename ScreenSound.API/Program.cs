@@ -2,11 +2,13 @@
 // Dependencias: Modelos e Dados
 
 #region USINGS
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using ScreenSound.API.Endpoints;
 using ScreenSound.Banco;
 using ScreenSound.Modelos;
 using ScreenSound.Shared.Dados.Banco;
+using ScreenSound.Shared.Dados.Modelos;
 using ScreenSound.Shared.Modelos.Modelos;
 using System.Text.Json.Serialization;
 
@@ -26,6 +28,35 @@ builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(
 // para que o Json consiga criar uma lista com os dados quando for necessario 
 
 builder.Services.AddDbContext<ScreenSoundContext>();
+
+
+builder.Services
+    .AddIdentityApiEndpoints<PessoaComAcesso>()
+    .AddEntityFrameworkStores<ScreenSoundContext>();
+
+
+
+
+
+//builder.Services.AddIdentity<PessoaComAcesso, PerfilDeAcesso>(options =>
+//{
+//    // Configurando as opções
+//    options.SignIn.RequireConfirmedAccount = false; // Desativa a necessidade de conta confirmada
+//    options.Tokens.PasswordResetTokenProvider = null; // Desativa recuperação de senha
+//    options.Tokens.EmailConfirmationTokenProvider = null; // Desativa confirmação por e-mail
+//    options.SignIn.RequireConfirmedEmail = false;
+//    options.Password.RequireDigit = false;             // Não exige dígitos na senha
+//    options.Password.RequiredLength = 1;               // Tamanho mínimo de 1 caractere
+//    options.Password.RequireLowercase = false;         // Não exige letras minúsculas
+//    options.Password.RequireUppercase = false;         // Não exige letras maiúsculas
+//    options.Password.RequireNonAlphanumeric = false;   // Não exige caracteres especiais
+//})
+//.AddEntityFrameworkStores<ScreenSoundContext>();
+
+
+
+builder.Services.AddAuthorization();
+
 builder.Services.AddTransient<DAL<Artista>>();
 builder.Services.AddTransient<DAL<Musica>>();
 builder.Services.AddTransient<DAL<Genero>>();
@@ -63,13 +94,23 @@ var app = builder.Build();
 
 #endregion
 
+#region UseConfigs
+
 app.UseCors("wasm");
+app.UseStaticFiles();
+app.UseAuthorization();
+
+#endregion
+
 
 #region ChamadaDeEndPoints
 
 app.AddEndPointsArtistas();
 app.AddEndpointMusicas();
 app.AddEndPointGeneros();
+
+
+app.MapGroup("auth").MapIdentityApi<PessoaComAcesso>().WithTags("Autorizacao");             
 
 #endregion
 
@@ -78,6 +119,5 @@ app.UseSwagger();
 app.UseSwaggerUI();
 //Chamando o Swagger
 
-app.UseCors(x => x.AllowAnyMethod().AllowAnyHeader().SetIsOriginAllowed(origin => true).AllowCredentials());
 
 app.Run();
