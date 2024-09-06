@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor.Services;
 using ScreenSound.Web;
 using ScreenSound.Web.Services;
+using System.Net;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -10,11 +11,13 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddMudServices();
 
-
-
+// Cookie Handler é uma função para que sej possivel lidar com os Cookies, passar
+// no AddHttpClient
+builder.Services.AddScoped<CokieHandler>();
 builder.Services.AddTransient<ArtistaAPI>();
 builder.Services.AddTransient<GeneroAPI>();
 builder.Services.AddTransient<MusicaAPI>();
+builder.Services.AddScoped<AuthAPI>();
 
 builder.Services.AddHttpClient("API", client =>
 {
@@ -26,8 +29,9 @@ builder.Services.AddHttpClient("API", client =>
     //Aceitar os Request só
     client.DefaultRequestHeaders.Add("Accept", "aplication/json");
 
+    
+}).AddHttpMessageHandler<CokieHandler>();
 
-});
 
 
 await builder.Build().RunAsync();
