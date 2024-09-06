@@ -13,8 +13,6 @@ using ScreenSound.Shared.Modelos.Modelos;
 using System.Text.Json.Serialization;
 
 
-
-
 #endregion
 
 #region BUILDER
@@ -110,7 +108,14 @@ app.AddEndpointMusicas();
 app.AddEndPointGeneros();
 
 
-app.MapGroup("auth").MapIdentityApi<PessoaComAcesso>().WithTags("Autorizacao");             
+app.MapGroup("auth").MapIdentityApi<PessoaComAcesso>().WithTags("Autorizacao");
+
+app.MapPost("auth/logout", async ([FromServices] SignInManager<PessoaComAcesso> signInManager ) =>
+{
+    await signInManager.SignOutAsync();
+    return Results.Ok();
+
+}).RequireAuthorization().WithTags("Autorizacao");
 
 #endregion
 
