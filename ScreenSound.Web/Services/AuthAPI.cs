@@ -43,7 +43,8 @@ public class AuthAPI(IHttpClientFactory factory) : AuthenticationStateProvider
     {
         try
         {
-            var response = await _httpClient.PostAsJsonAsync("auth/login", new
+             // MUDEI PARA USECOOKIES=TRUE
+            var response = await _httpClient.PostAsJsonAsync("auth/login?useCookies=true", new
             {
                 email,
                 password = senha
