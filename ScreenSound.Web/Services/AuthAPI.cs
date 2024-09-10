@@ -14,32 +14,26 @@ public class AuthAPI(IHttpClientFactory factory) : AuthenticationStateProvider
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
         autenticado = false;
-        ClaimsPrincipal pessoa = new(); 
+        ClaimsPrincipal pessoa = new();
         // Sem info = não autenticado
 
         var resp = await _httpClient.GetAsync("auth/manage/info");
         if (resp.IsSuccessStatusCode)
         {
             var info = await resp.Content.ReadFromJsonAsync<InfoPessoaResponse>();
-       
 
-        if (info is not null)
-        {
-            Claim[] dados =
+            if (info is not null)
+            {
+                Claim[] dados =
                 [
                     new Claim(ClaimTypes.Name, info.Email), // Pega o dado de email e leva pro Name
                     new Claim(ClaimTypes.Email, info.Email), // O mesmo pro email
                 ];
 
-            var idenity = new ClaimsIdentity(dados, "Cookies"); // Constroi a Identidade baseado no nome e email
-                                                                // com a autenticação via Cookies
-
-            pessoa = new ClaimsPrincipal(idenity);
-                // Construido info, autenticado
-
-
+                var identidade = new ClaimsIdentity(dados, "Cookies"); // Constroi a Identidade baseado no nome e email
+                                                                       // com a autenticação via Cookies
+                pessoa = new ClaimsPrincipal(identidade);
                 autenticado = true;
-
             }
         }
         return new AuthenticationState(pessoa);
@@ -49,7 +43,6 @@ public class AuthAPI(IHttpClientFactory factory) : AuthenticationStateProvider
     {
         try
         {
-
             var response = await _httpClient.PostAsJsonAsync("auth/login", new
             {
                 email,
@@ -75,7 +68,6 @@ public class AuthAPI(IHttpClientFactory factory) : AuthenticationStateProvider
         await _httpClient.PostAsync("auth/logout", null);
         NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
     }
-
 
     public async Task<bool> VerificaAutenticado()
     {

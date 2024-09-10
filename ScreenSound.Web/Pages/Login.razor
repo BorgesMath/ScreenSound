@@ -46,14 +46,14 @@
     private async Task FazerLogin()
     {
         var resultado = await authAPI.LoginAsync(email!, senha!);
-        // if (resultado.Sucesso)
-        // {
-        //     navigation.NavigateTo("/Artistas");
-        // }
-        // else
-        // {
-        //     navigation.NavigateTo("/Login");
-        // }
+        if (resultado.Sucesso)
+        {
+            navigation.NavigateTo("/Artistas");
+        }
+        else
+        {
+            navigation.NavigateTo("/Login");
+        }
 
     }
 
