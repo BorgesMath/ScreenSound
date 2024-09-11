@@ -1,6 +1,10 @@
 ﻿@page "/Login"
+
 @inject AuthAPI authAPI
 @inject NavigationManager navigation
+@attribute [AllowAnonymous]
+@* Permite acesso anonimo *@
+
 
 <MudPaper Class="px-8 pt-2 pb-4 mx-16 my-8" Justify="Justify.Center">
 
@@ -43,12 +47,16 @@
     private string? email { get; set; }
     private string? senha { get; set; }
 
+    [SupplyParameterFromQuery]
+    private string? ReturnUrl { get; set; }
+
     private async Task FazerLogin()
     {
         var resultado = await authAPI.LoginAsync(email!, senha!);
         if (resultado.Sucesso)
         {
-            navigation.NavigateTo("/Artistas");
+            if (ReturnUrl is not null)
+                navigation.NavigateTo(ReturnUrl);
         }
         else
         {
