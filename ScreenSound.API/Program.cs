@@ -13,8 +13,6 @@ using ScreenSound.Shared.Modelos.Modelos;
 using System.Text.Json.Serialization;
 
 
-
-
 #endregion
 
 #region BUILDER
@@ -33,25 +31,6 @@ builder.Services.AddDbContext<ScreenSoundContext>();
 builder.Services
     .AddIdentityApiEndpoints<PessoaComAcesso>()
     .AddEntityFrameworkStores<ScreenSoundContext>();
-
-
-
-
-
-//builder.Services.AddIdentity<PessoaComAcesso, PerfilDeAcesso>(options =>
-//{
-//    // Configurando as opções
-//    options.SignIn.RequireConfirmedAccount = false; // Desativa a necessidade de conta confirmada
-//    options.Tokens.PasswordResetTokenProvider = null; // Desativa recuperação de senha
-//    options.Tokens.EmailConfirmationTokenProvider = null; // Desativa confirmação por e-mail
-//    options.SignIn.RequireConfirmedEmail = false;
-//    options.Password.RequireDigit = false;             // Não exige dígitos na senha
-//    options.Password.RequiredLength = 1;               // Tamanho mínimo de 1 caractere
-//    options.Password.RequireLowercase = false;         // Não exige letras minúsculas
-//    options.Password.RequireUppercase = false;         // Não exige letras maiúsculas
-//    options.Password.RequireNonAlphanumeric = false;   // Não exige caracteres especiais
-//})
-//.AddEntityFrameworkStores<ScreenSoundContext>();
 
 
 
@@ -80,15 +59,32 @@ builder.Services.AddSwaggerGen();
 //e até mesmo testar as chamadas API diretamente da interface de documentação.
 
 
-builder.Services.AddCors(
-    options => options.AddPolicy(
-        "wasm",
-        policy => policy.WithOrigins([builder.Configuration["BackendUrl"] ?? "https://localhost:7089",
-            builder.Configuration["FrontendUrl"] ?? "https://localhost:7015"])
-            .AllowAnyMethod()
-            .SetIsOriginAllowed(pol => true)
-            .AllowAnyHeader()
-            .AllowCredentials()));
+//builder.Services.AddCors(
+//    options => options.AddPolicy(
+//        "wasm",
+//        policy => policy.WithOrigins([builder.Configuration["BackendUrl"] ?? "https://localhost:7089",
+//            builder.Configuration["FrontendUrl"] ?? "https://localhost:7015"])
+//            .AllowAnyMethod()
+//            .SetIsOriginAllowed(pol => true)
+//            .AllowAnyHeader()
+//            .AllowCredentials()));
+
+
+
+builder.Services.AddCors(options => options.AddPolicy(
+    "wasm",
+    policy => policy
+        .WithOrigins(
+        [
+            builder.Configuration["BackendUrl"] ?? "https://localhost:7089",
+            builder.Configuration["FrontendUrl"] ?? "https://localhost:7015",
+            "https://localhost:7210", // Outra porta para o backend
+            "https://localhost:7002"  // Outra porta para o frontend
+        ])
+        .AllowAnyMethod()
+        .AllowAnyHeader()
+        .AllowCredentials()));
+
 
 var app = builder.Build();
 
@@ -98,7 +94,11 @@ var app = builder.Build();
 
 app.UseCors("wasm");
 app.UseStaticFiles();
+
+app.UseAuthentication();
 app.UseAuthorization();
+
+
 
 #endregion
 
@@ -110,7 +110,14 @@ app.AddEndpointMusicas();
 app.AddEndPointGeneros();
 
 
-app.MapGroup("auth").MapIdentityApi<PessoaComAcesso>().WithTags("Autorizacao");             
+app.MapGroup("auth").MapIdentityApi<PessoaComAcesso>().WithTags("Autorizacao");
+
+app.MapPost("auth/logout", async ([FromServices] SignInManager<PessoaComAcesso> signInManager) =>
+{
+    await signInManager.SignOutAsync();
+    return Results.Ok();
+
+}).RequireAuthorization().WithTags("Autorizacao");
 
 #endregion
 
@@ -121,3 +128,5 @@ app.UseSwaggerUI();
 
 
 app.Run();
+
+
