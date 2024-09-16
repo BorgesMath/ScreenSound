@@ -5,7 +5,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using ScreenSound.API.Endpoints;
-using ScreenSound.Banco;
 using ScreenSound.Modelos;
 using ScreenSound.Shared.Dados.Banco;
 using ScreenSound.Shared.Dados.Modelos;
@@ -36,6 +35,7 @@ builder.Services
 
 builder.Services.AddAuthorization();
 
+builder.Services.AddTransient<DAL<PessoaComAcesso>>();
 builder.Services.AddTransient<DAL<Artista>>();
 builder.Services.AddTransient<DAL<Musica>>();
 builder.Services.AddTransient<DAL<Genero>>();

@@ -20,6 +20,7 @@ public class ScreenSoundContext : IdentityDbContext<PessoaComAcesso, PerfilDeAce
     public DbSet<Artista> Artistas { get; set; }
     public DbSet<Musica> Musicas { get; set; }
     public DbSet<Genero> Generos { get; set; }
+    public DbSet<AvaliacaoArtista> AvaliacoesArtistas { get; set; }
 
     private readonly string connectionString = "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=ScreenSoundV1;Integrated Security=True;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False";
 
@@ -37,7 +38,7 @@ public class ScreenSoundContext : IdentityDbContext<PessoaComAcesso, PerfilDeAce
 
 
         //Quando você define.UseLazyLoadingProxies(false), você desativa o Lazy Loading.
-        //Isso significa que todas as entidades relacionadas serão carregadas imediatamente
+        //Isso significa que todas as entdades relacionadas serão carregadas imediatamente
         //junto com a entidade principal, em vez de serem carregadas sob demanda.
 
 
@@ -61,6 +62,12 @@ public class ScreenSoundContext : IdentityDbContext<PessoaComAcesso, PerfilDeAce
     .WithMany(a => a.Musicas)
     .HasForeignKey(m => m.ArtistaId);
         //Aqui para fazer a conexao entre artista e Musica
+
+        modelBuilder.Entity<AvaliacaoArtista>()
+            .HasKey(a => new { a.ArtistaID, a.PessoaID });
+        //Aqui estou falando que AVALLIACAOARTISTA tem uma chave primaria, como necessario
+        // e ela é composta por essas duas prop
+
 
     }
 
