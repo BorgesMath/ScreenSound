@@ -25,6 +25,8 @@
                       RequiredError="Campo obrigatório." />
 
         <div class="d-flex align-center justify-space-between mt-4">
+
+
             <MudButton Variant="Variant.Filled"
                        @onclick="Deletar"
                        Color="Color.Secondary"
@@ -33,7 +35,10 @@
             </MudButton>
         </div>
 
-        <MudButton Variant="Variant.Filled"
+        <MudRating @bind-SelectedValue="classificacao" 
+        @onclick="AvaliarArtista"/>
+
+        <MudButton Variant="Variant.Filled" 
                    Color="Color.Primary"
                    Class="ml-auto"
                    @onclick="Editar">
@@ -49,13 +54,14 @@
             </MudButton>
         </div>
 
+
     </MudForm>
 </MudPaper>
 
 
 
 @code {
-
+    private int classificacao; 
     private string? nome;
     private string? bio;
 
@@ -91,6 +97,12 @@
     private void Voltar()
     {
         navigationManager.NavigateTo("/");
+    }
+
+
+    private async Task AvaliarArtista()
+    {
+        await artistaAPI.AvaliaArtistaAsync(response!.Id, classificacao);
     }
 
 }

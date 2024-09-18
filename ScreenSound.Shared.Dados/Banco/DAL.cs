@@ -54,5 +54,20 @@ namespace ScreenSound.Shared.Dados.Banco
         {
             return _context.Musicas.Include(m => m.Artista).Include(m => m.Generos).AsEnumerable();
         }
+
+        public T? RecuperarComAvaliacao(Func<T, bool> condicao)
+        {
+            return _context.Set<T>().Include("Avaliacao").FirstOrDefault(condicao);
+        }
+
+        public IEnumerable<T> ListarComAvaliacao()
+        {
+            return _context.Set<T>()
+                .Include("Avaliacao") // Inclui a relação de Avaliação ao listar
+                .AsEnumerable();
+        }
     }
+
 }
+
+

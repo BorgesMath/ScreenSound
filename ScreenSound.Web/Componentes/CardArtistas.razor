@@ -10,6 +10,7 @@ que é mostrado pelo [Request] *@
     </MudCardHeader>
     <MudCardContent>
         <MudText Typo="Typo.body2">@Artista!.Bio</MudText>
+        <MudRating SelectedValue="@Convert.ToInt32(Artista!.Classificacao)" />
     </MudCardContent>
 
 
@@ -20,7 +21,7 @@ que é mostrado pelo [Request] *@
                    Href=@($"/EditarArtista/{Artista!.Nome}")>Detalhes</MudButton>
     </MudCardActions>
 
-
+    
 </MudCard>
 
 @code {

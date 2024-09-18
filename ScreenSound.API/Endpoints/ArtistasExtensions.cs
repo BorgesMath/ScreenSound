@@ -30,7 +30,7 @@ public static class ArtistasExtensions
             //DAL<Artista> dal = new(new ScreenSoundContext()); => Resolvido pelo Transient e DbContext!!
             // Chamando o DAL para Artistas que manipula o BD, para ele é necessario 
             // passar a conexão 
-            var listaDeArtistas = dal.Listar();
+            var listaDeArtistas = dal.ListarComAvaliacao();
 
             if (listaDeArtistas is null)
             {
@@ -129,7 +129,7 @@ public static class ArtistasExtensions
             [FromServices] DAL<PessoaComAcesso> dalPessoa
             ) =>
         {
-            var artista = dalArtista.RecuperarPor(a => a.Id ==  request.ArtistaID);
+            var artista = dalArtista.RecuperarPor(a => a.Id == request.ArtistaID);
             if (artista is null) return Results.NotFound();
 
             var email = context.User.Claims
@@ -143,7 +143,7 @@ public static class ArtistasExtensions
 
             var avaliacao = artista.Avaliacao.FirstOrDefault(a => a.ArtistaID == artista.Id && a.PessoaID == pessoa.Id);
 
-            if(avaliacao is null) artista.AdicionarNota(pessoa.Id, request.Nota);
+            if (avaliacao is null) artista.AdicionarNota(pessoa.Id, request.Nota);
 
             else avaliacao.Nota = request.Nota;
 
@@ -155,18 +155,20 @@ public static class ArtistasExtensions
 
 
 
+
+
         groupBuilder.MapGet("{id}/avaliacao", (
-            int id,
-            HttpContext context,
-            [FromServices] DAL<Artista> dalArtista,
-            [FromServices] DAL<PessoaComAcesso> dalPessoa
-            ) =>
+    int id,
+    HttpContext context,
+    [FromServices] DAL<Artista> dalArtista,
+    [FromServices] DAL<PessoaComAcesso> dalPessoa
+    ) =>
         {
-            var artista = dalArtista.RecuperarPor(a => a.Id == id);
+            var artista = dalArtista.RecuperarComAvaliacao(a => a.Id == id);
             if (artista is null) return Results.NotFound();
-            dalArtista.Context.Entry(artista).Collection(a => a.Avaliacao).Load();
+
             var email = context.User.Claims
-                .FirstOrDefault(c => c.Type.Equals(ClaimTypes.Email))?.Value
+                .FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value
                 ?? throw new InvalidOperationException("Não foi encontrado o email da pessoa logada");
 
             var pessoa = dalPessoa.RecuperarPor(p => p.Email!.Equals(email))
@@ -176,9 +178,10 @@ public static class ArtistasExtensions
                 .Avaliacao
                 .FirstOrDefault(a => a.ArtistaID == id && a.PessoaID == pessoa.Id);
 
-            if (avaliacao is null) return Results.Ok(new AvaliacaoArtistaResponse(id, 0));
+            if (avaliacao is null) return Results.Ok(new AvaliacaoArtistaResponse(0, id));
             else return Results.Ok(new AvaliacaoArtistaResponse(avaliacao.Nota, id));
         });
+
         #endregion
     }
 
@@ -190,7 +193,13 @@ public static class ArtistasExtensions
 
     private static ArtistaResponse EntityToResponse(Artista artista)
     {
-        return new ArtistaResponse(artista.Id, artista.Nome, artista.Bio, artista.FotoPerfil);
+        return new ArtistaResponse(artista.Id, artista.Nome, artista.Bio, artista.FotoPerfil)
+        {
+            Cassificacao = artista.Avaliacao
+                            .Select(a => a.Nota)
+                            .DefaultIfEmpty(0)
+                            .Average()
+        };
     }
 
 

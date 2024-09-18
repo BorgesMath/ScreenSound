@@ -39,4 +39,15 @@ public class ArtistaAPI(IHttpClientFactory factory)
        await _httpClient.PutAsJsonAsync("artistas", requestEdit);
     }
 
+    public async Task AvaliaArtistaAsync(int artistaId, double nota)
+    {
+        await _httpClient.PostAsJsonAsync("artistas/avaliacao", new { artistaId, nota });
+    }
+
+    public async Task<AvaliacaoDoArtistaResponse?> GetAvaliacaoDaPessoaLogadaAsync(int artistaId)
+    {
+        return await _httpClient
+            .GetFromJsonAsync<AvaliacaoDoArtistaResponse?>($"artistas/{artistaId}/avaliacao");
+    }
+
 }
